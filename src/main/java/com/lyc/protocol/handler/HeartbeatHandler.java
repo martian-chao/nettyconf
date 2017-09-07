@@ -2,6 +2,7 @@ package com.lyc.protocol.handler;
 
 import com.lyc.protocol.vo.Header;
 import com.lyc.protocol.vo.MessageType;
+import com.lyc.protocol.vo.MyCommConfig;
 import com.lyc.protocol.vo.NettyMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -17,6 +18,8 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class HeartbeatHandler extends ChannelInboundHandlerAdapter {
+    //向服务端发送心跳间隔时间 30秒
+    private long aliveIdleTimeClientSend= MyCommConfig.aliveIdleTimeClientSend;
     private Logger logger = LoggerFactory.getLogger(HeartbeatHandler.class);
     private ScheduledFuture<?> heartbeatScheduled;
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -25,15 +28,19 @@ public class HeartbeatHandler extends ChannelInboundHandlerAdapter {
         if (request.getHeader() == null) ctx.fireChannelRead(msg);
 
         if (request.getHeader().getType() == MessageType.ACCEPT_RES) {
-            heartbeatScheduled = ctx.executor().scheduleAtFixedRate(new HeartbeatTask(ctx), 0, 30, TimeUnit.SECONDS);
+            //如果是握手应答消息
+            heartbeatScheduled = ctx.executor().scheduleAtFixedRate(new HeartbeatTask(ctx),
+                    0, aliveIdleTimeClientSend, TimeUnit.SECONDS);
 
         } else if (request.getHeader().getType() == MessageType.HEARTBEAT_REQ) {
+            //如果是心跳请求
             NettyMessage response = new NettyMessage();
             response.setHeader(new Header().setType(MessageType.HEARTBEAT_RES));
             response.setBody("心跳回应信息.");
             ctx.writeAndFlush(response);
             System.out.println("收到客户端心跳包,即将返回pong消息..." + request.getBody() + new Date());
         } else if (request.getHeader().getType() == MessageType.HEARTBEAT_RES) {
+            //如果是心跳应答
             System.out.println("心跳正常..." + new Date());
         }
     }

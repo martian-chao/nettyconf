@@ -2,6 +2,7 @@ package com.lyc.protocol.handler;
 
 import com.lyc.protocol.vo.Header;
 import com.lyc.protocol.vo.MessageType;
+import com.lyc.protocol.vo.MyCommConfig;
 import com.lyc.protocol.vo.NettyMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -15,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 服务器登录返回handler
- *
+ * 服务端的握手接入和安全认证
  */
 public class LoginResponseHandler extends ChannelInboundHandlerAdapter {
     private Logger logger = LoggerFactory.getLogger(LoginResponseHandler.class);
@@ -25,21 +26,46 @@ public class LoginResponseHandler extends ChannelInboundHandlerAdapter {
     private static Set<String> whiteHost = new HashSet<String>() {
         {
             //加载白名单
+            //切分本地服务器可以接收的ip
+            String localServerAcceptIp = MyCommConfig.localServerAcceptIp;
+            String[] localServerAcceptIps = localServerAcceptIp.split(";");
+            for (int i = 0; i < localServerAcceptIps.length; i++) {
+                localServerAcceptIp=localServerAcceptIps[i];
+                add(localServerAcceptIp);
+            }
+            //白名单中加入本机地址
             add("127.0.0.1");
         }
     };
+    private static Set<String> blackHost = new HashSet<String>(){
+        {
+            //加载黑名单
+            String localServerRefuseIp = MyCommConfig.localServerRefuseIp;
+            String[] localServerRefuseIps = localServerRefuseIp.split(";");
+            for (int i = 0; i < localServerRefuseIps.length; i++) {
+                localServerRefuseIp = localServerRefuseIps[i];
+                add(localServerRefuseIp);
+            }
+        }
+    };
+
 
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        logger.info("LoginResponseHandler-channelRead");
+        logger.info("LoginRespHandler-channelRead");
         NettyMessage request = (NettyMessage) msg;
         //判断是否握手消息
         if (request != null && request.getHeader().getType() == MessageType.ACCEPT_REQ) {
             if (request.getBody() == null || !request.getBody().equals("Hello Netty Private Protocol.")) {
                 ctx.close();
             } else {
-                System.out.println("登录成功,进行白名单、是否重复连接校验.");
+                System.out.println("进行白名单、黑名单，是否重复连接校验.");
                 String address = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress().getHostAddress();
-                if (!whiteHost.contains(address)) {
+                System.out.println("目前IP地址为："+address);
+                if (blackHost.contains(address)) {
+                    System.out.println("该IP在黑名单上，禁止访问服务器，断开链接.");
+                    ctx.close();
+                }
+                if (!whiteHost.contains(address)){
                     System.out.println("该IP禁止访问服务器，断开链接.");
                     ctx.close();
                 }
@@ -55,7 +81,6 @@ public class LoginResponseHandler extends ChannelInboundHandlerAdapter {
                 response.setHeader(header);
                 response.setBody("登录成功，返回信息.");
                 ctx.writeAndFlush(response);
-                //TODO 待验证 这个地方不需要再调用ctx.fireChannelRead往下走的原因是此消息已经被判断为连接请求，并且已经处理返回了，所以不需要往下走了
             }
         } else {
             ctx.fireChannelRead(msg);

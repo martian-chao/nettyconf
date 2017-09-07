@@ -7,7 +7,7 @@ import java.io.IOException;
 
 /**
  * netty源码，因为引入不了所以直接复制出来
- * {@link ByteOutput} implementation which writes the data to a {@link ByteBuf}
+ *
  */
 class ChannelBufferByteOutput implements ByteOutput {
 

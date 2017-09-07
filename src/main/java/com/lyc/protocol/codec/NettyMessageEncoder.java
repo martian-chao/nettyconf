@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Description： 私有协议编码
- * Created by Ambitor on 2017/4/26.
+ * 私有协议编码
+ *
  */
 public class NettyMessageEncoder extends MessageToMessageEncoder<NettyMessage> {
     private Logger logger = LoggerFactory.getLogger(NettyMessageEncoder.class);

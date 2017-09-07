@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 /**
- * @Description： 编码器
- * Created by Ambitor on 2017/4/26.
+ * 编码器
+ *
  */
 public class MarshallingEncoder {
     private Logger logger = LoggerFactory.getLogger(MarshallingEncoder.class);

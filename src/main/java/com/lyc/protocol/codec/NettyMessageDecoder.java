@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @Description： 私有协议解码
- * Created by Ambitor on 2017/4/26.
+ * 私有协议解码
+ *
  */
 public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
     private Logger logger = LoggerFactory.getLogger(NettyMessageDecoder.class);

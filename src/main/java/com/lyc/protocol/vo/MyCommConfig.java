@@ -1,4 +1,4 @@
-package com.lyc.demo1.vo;
+package com.lyc.protocol.vo;
 
 
 import org.slf4j.Logger;
@@ -29,15 +29,15 @@ public class MyCommConfig
 	public static int maxSrvRecvConnCountPerPort = 20;				//每个本地服务器端口接收上一客户机对应端口的最大连接数
 	public static int maxClientSendConnCountPerPort = 20;			//本地客户机至下一机器每个Ip+端口最大发送连接数
 	
-	public static long aliveIdleTimeSrvSend = 30000;				//本地服务器发送连接健康检测空闲时间 30秒
-	public static long aliveIdleTimeClientSend = 30000;				//本地客户机发送连接健康检测空闲时间 30秒
-	public static int aliveTimeoutSrvSend = 5000;					//本地服务器发送连接健康检测应答超时时间 5秒
-	public static int aliveTimeoutClientSend = 5000;				//本地客户机发送连接健康检测应答超时时间 5秒
+	public static long aliveIdleTimeSrvSend = 30000;				//本地服务器发送心跳间隔时间 30秒
+	public static long aliveIdleTimeClientSend = 30000;				//本地客户机发送心跳间隔时间 30秒
+	public static int aliveTimeoutSrvSend = 5000;					//本地服务器发送心跳应答超时时间 5秒
+	public static int aliveTimeoutClientSend = 5000;				//本地客户机发送心跳应答超时时间 5秒
 	
 	public static long intervalConfigManagerRefresh = 60000;		//参数刷新间隔时间 1分钟
 	public static long intervalStatusMonitor = 600000;				//状态查询间隔时间 10分钟
-	public static long intervalServerConnector = 30000;				//服务器连接器运行间隔时间 30秒
-	public static long intervalClientConnector = 30000;				//客户端连接器运行间隔时间 30秒
+	public static long intervalServerConnector = 30000;				//服务器重连间隔时间 30秒
+	public static long intervalClientConnector = 30000;				//客户端重连间隔时间 30秒
 	
 	public static int localClientRecvConnTimeout = 60000;		//本机客户机接收连接超时时间
 	public static int localServerRecvConnTimeout = 60000;		//本地服务器接收连接超时时间
@@ -47,6 +47,46 @@ public class MyCommConfig
 	static Map oldParas = Collections.synchronizedMap(new HashMap());
 	static Logger logger = LoggerFactory.getLogger(MyCommConfig.class);
 
+
+	/**
+	 * //初始化MyCommConfig数据
+	 * @param cfgName 配置文件名称路径
+	 */
+	/*public static void initMyCommConfig(String cfgName){
+		Properties pro =null;
+		FileInputStream in=null;
+		while(true){
+			try {
+				//读取配置文件
+				pro=new Properties();
+				in= new FileInputStream(cfgName);
+				pro.load(in);
+
+				Iterator<String> it = pro.stringPropertyNames().iterator();
+				//配置文件数据的临时存储容器
+				Map parameters = Collections.synchronizedMap(new HashMap());
+				while(it.hasNext())
+				{
+					String keyStr = it.next();
+					parameters.put(keyStr, pro.getProperty(keyStr));
+				}
+				//初始化MyCommConfig数据
+				MyCommConfig.refresh(parameters);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}finally {
+				if (in!=null){
+					try {
+						in.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					} finally {
+						in=null;
+					}
+				}
+			}
+		}
+	}*/
 
     /**
      * 初始化MyCommConfig中的数据

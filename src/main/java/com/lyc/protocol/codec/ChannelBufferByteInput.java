@@ -7,8 +7,8 @@ import org.jboss.marshalling.ByteInput;
 import java.io.IOException;
 
 /**
- * @Description： netty源码，因为引入不了所以直接复制出来
- * Created by Ambitor on 2017/4/26.
+ * netty源码，因为引入不了所以直接复制出来
+ *
  */
 class ChannelBufferByteInput implements ByteInput {
     private final ByteBuf buffer;
