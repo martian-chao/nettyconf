@@ -56,12 +56,12 @@ public class ProtocolServer {
                             pipeline.addLast("HeartbeatHandler", new HeartbeatHandler());
                         }
                     });
-//            ChannelFuture future = bootstrap.bind( port).sync();
-            Channel channel = bootstrap.bind( port).sync().channel();
+            ChannelFuture future = bootstrap.bind( port).sync();
+//            Channel channel = bootstrap.bind( port).sync().channel();
 
-            System.out.println("服务器启动成功.");
-//            future.channel().closeFuture().sync();
-            channel.closeFuture().sync().channel();
+            System.out.println("服务器端口："+port+"绑定成功！");
+            future.channel().closeFuture().sync();
+//            channel.closeFuture().sync().channel();
         }finally {
             acceptGroup.shutdownGracefully();
             serverGroup.shutdownGracefully();

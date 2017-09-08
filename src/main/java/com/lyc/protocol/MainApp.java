@@ -16,8 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class MainApp {
     private static Logger logger = LoggerFactory.getLogger(MainApp.class);
     private ThreadPoolExecutor executor =
-            new ThreadPoolExecutor(1, 1, 60, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
-//    InputStream in = Object.getClass().getResourceAsStream("netty/app/conf.properties");
+            new ThreadPoolExecutor(10, 15, 60, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
     public static void main(String[] args) {
 
         try {
@@ -27,7 +26,6 @@ public class MainApp {
 
             new MainApp().serverStart();
 
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -35,7 +33,7 @@ public class MainApp {
     }
 
     /**
-     * 启动服务器
+     * 启动服务器，绑定多个端口
      */
     public  void serverStart(){
         //本机服务器的端口号和回连客户端端口号数组
@@ -44,23 +42,20 @@ public class MainApp {
 //        String[] clientPortGroups = MyCommConfig.lastClientPort.split("，");
         System.out.println(Arrays.toString(localPortGroups)+"--------长度："+localPortGroups.length);
         for (int i = 0; i < localPortGroups.length; i++) {
-            System.out.println(localPortGroups[i]+"!!!!!");
-            int port=Integer.parseInt(localPortGroups[i].split(",")[i]);
-            System.out.println(localPortGroups[i].split(",")[i]+"!!");
-            //用线程完成
+            int port=Integer.parseInt(localPortGroups[i]);
+            //用线程池完成同时绑定多个端口
             executor.submit(new Runnable() {
                 @Override
                 public void run() {
                     //启动服务器
                     try {
+//                        System.out.println(port+"服务器端口开始绑定");
                         new ProtocolServer().bind(port);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
                 }
             });
-
         }
 
         //启动客户端
